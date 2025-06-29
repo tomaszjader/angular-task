@@ -1,9 +1,8 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Subject, takeUntil } from 'rxjs';
 import { MatDialog } from '@angular/material/dialog';
 import { PeriodicElement } from '../../models/periodic-element.model';
-import { PeriodicElementsService } from '../../services/periodic-elements.service';
 import { EditElementDialogComponent } from '../edit-element-dialog/edit-element-dialog.component';
 import { MatTableModule } from '@angular/material/table';
 import { MatCardModule } from '@angular/material/card';
@@ -17,7 +16,7 @@ import { DialogData } from '../../models/dialog-data.model';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
-import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
+import { PeriodicElementsStore } from '../../store/periodic-elements.store';
 
 
 @Component({
@@ -43,19 +42,25 @@ import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 })
 export class TablesComponent implements OnInit, OnDestroy {
   displayedColumns: string[] = ['position', 'name', 'symbol', 'weight'];
-  elements: PeriodicElement[] = [];
-  filteredElements: PeriodicElement[] = [];
-  isLoading = false;
-  error: string | null = null;
+  
+  readonly store = inject(PeriodicElementsStore);
+  
+  readonly elements = this.store.elements;
+  readonly filteredElements = this.store.filteredElements;
+  readonly isLoading = this.store.isLoading;
+  readonly error = this.store.error;
+  readonly searchTerm = this.store.searchTerm;
+  readonly elementsCount = this.store.elementsCount;
+  readonly filteredElementsCount = this.store.filteredElementsCount;
+  readonly hasElements = this.store.hasElements;
+  readonly isSearching = this.store.isSearching;
+  readonly hasSearchResults = this.store.hasSearchResults;
   
   searchControl = new FormControl('');
   
   private destroy$ = new Subject<void>();
 
-  constructor(
-    private periodicElementsService: PeriodicElementsService,
-    private dialog: MatDialog
-  ) {}
+  constructor(private dialog: MatDialog) {}
 
   ngOnInit(): void {
     this.loadElements();
@@ -68,62 +73,25 @@ export class TablesComponent implements OnInit, OnDestroy {
   }
 
   loadElements(): void {
-    this.isLoading = true;
-    this.error = null;
-
-    this.periodicElementsService.getElements()
-      .pipe(takeUntil(this.destroy$))
-      .subscribe({
-        next: (data) => {
-          this.elements = data;
-          this.filteredElements = [...data];
-          this.isLoading = false;
-        },
-        error: (error) => {
-          this.error = error;
-          this.isLoading = false;
-          console.error('Error loading data:', error);
-        }
-      });
+    this.store.loadElements();
   }
 
   retry(): void {
+    this.store.clearError();
     this.loadElements();
   }
 
   setupSearchFilter(): void {
     this.searchControl.valueChanges
-      .pipe(
-        debounceTime(2000), 
-        distinctUntilChanged(),
-        takeUntil(this.destroy$)
-      )
+      .pipe(takeUntil(this.destroy$))
       .subscribe(searchTerm => {
-        this.filterElements(searchTerm || '');
+        this.store.searchElements(searchTerm || '');
       });
-  }
-
-  filterElements(searchTerm: string): void {
-    if (!searchTerm.trim()) {
-      this.filteredElements = [...this.elements];
-      return;
-    }
-
-    const lowerSearchTerm = searchTerm.toLowerCase().trim();
-    
-    this.filteredElements = this.elements.filter(element => {
-      return (
-        element.name.toLowerCase().includes(lowerSearchTerm) ||
-        element.symbol.toLowerCase().includes(lowerSearchTerm) ||
-        element.position.toString().includes(lowerSearchTerm) ||
-        element.weight.toString().includes(lowerSearchTerm)
-      );
-    });
   }
 
   clearSearch(): void {
     this.searchControl.setValue('');
-    this.filteredElements = [...this.elements];
+    this.store.clearSearch();
   }
 
   editElement(element: PeriodicElement, field: keyof PeriodicElement): void {
@@ -151,18 +119,9 @@ export class TablesComponent implements OnInit, OnDestroy {
       .pipe(takeUntil(this.destroy$))
       .subscribe((updatedElement: PeriodicElement) => {
         if (updatedElement) {
-          this.updateElementInTable(updatedElement);
+          this.store.updateElement(updatedElement);
         }
       });
-  }
-
-  private updateElementInTable(updatedElement: PeriodicElement): void {
-    const index = this.elements.findIndex(el => el.position === updatedElement.position);
-    if (index !== -1) {
-      this.elements[index] = updatedElement;
-      this.elements = [...this.elements];
-      this.filterElements(this.searchControl.value || '');
-    }
   }
 
   getFieldDisplayName(field: string): string {
@@ -173,5 +132,19 @@ export class TablesComponent implements OnInit, OnDestroy {
       weight: 'Atomic Weight'
     };
     return fieldNames[field] || field;
+  }
+
+  addNewElement(element: PeriodicElement): void {
+    this.store.addElement(element);
+  }
+
+  removeElement(position: number): void {
+    this.store.removeElement(position);
+  }
+
+  resetTable(): void {
+    this.searchControl.setValue('');
+    this.store.reset();
+    this.loadElements();
   }
 }

@@ -6,7 +6,7 @@
         </mat-card-header>
 
         <mat-card-content>
-            <div class="search-container" *ngIf="!isLoading && !error">
+            <div class="search-container" *ngIf="!isLoading() && !error()">
                 <mat-form-field appearance="outline" class="search-field">
                     <mat-label>Search elements...</mat-label>
                     <input 
@@ -26,32 +26,57 @@
                     </button>
                 </mat-form-field>
                 
-                <div class="search-info" *ngIf="searchControl.value">
+                <div class="search-info" *ngIf="isSearching()">
                     <mat-icon class="info-icon">info</mat-icon>
-                    <span>Showing {{ filteredElements.length }} of {{ elements.length }} elements</span>
+                    <span>Showing {{ filteredElementsCount() }} of {{ elementsCount() }} elements</span>
+                    <span *ngIf="!hasSearchResults()" class="no-results-text">
+                        - No matches found
+                    </span>
                 </div>
             </div>
 
-            <div *ngIf="isLoading" class="loading-container">
+            <div *ngIf="isLoading()" class="loading-container">
                 <mat-spinner diameter="50"></mat-spinner>
-                <p>Data loading...</p>
+                <p>Loading elements...</p>
             </div>
 
-
-            <div *ngIf="error && !isLoading" class="error-container">
+            <div *ngIf="error() && !isLoading()" class="error-container">
                 <mat-icon color="warn">error</mat-icon>
-                <p class="error-message">{{ error }}</p>
+                <p class="error-message">{{ error() }}</p>
                 <button mat-raised-button color="primary" (click)="retry()">
                     <mat-icon>refresh</mat-icon>
-                    Try again
+                    Try Again
                 </button>
             </div>
 
+            <div *ngIf="!isLoading() && !error() && hasElements()" class="table-container">
+                <div class="table-actions" *ngIf="hasElements()">
+                    <div class="table-stats">
+                        <mat-chip-set>
+                            <mat-chip>
+                                <mat-icon>science</mat-icon>
+                                Total Elements: {{ elementsCount() }}
+                            </mat-chip>
+                            <mat-chip *ngIf="isSearching()">
+                                <mat-icon>search</mat-icon>
+                                Filtered: {{ filteredElementsCount() }}
+                            </mat-chip>
+                        </mat-chip-set>
+                    </div>
+                    
+                    <div class="action-buttons">
+                        <button 
+                            mat-stroked-button 
+                            color="accent" 
+                            (click)="resetTable()"
+                            *ngIf="isSearching()">
+                            <mat-icon>refresh</mat-icon>
+                            Reset View
+                        </button>
+                    </div>
+                </div>
 
-            <div *ngIf="!isLoading && !error && elements.length > 0" class="table-container">
-                <table mat-table [dataSource]="filteredElements" class="mat-elevation-8 editable-table">
-
-
+                <table mat-table [dataSource]="filteredElements()" class="mat-elevation-8 editable-table">
                     <ng-container matColumnDef="position">
                         <th mat-header-cell *matHeaderCellDef> 
                             Number 
@@ -66,7 +91,6 @@
                         </td>
                     </ng-container>
 
-
                     <ng-container matColumnDef="name">
                         <th mat-header-cell *matHeaderCellDef> 
                             Name 
@@ -80,7 +104,6 @@
                             <mat-icon class="edit-icon">edit</mat-icon>
                         </td>
                     </ng-container>
-
 
                     <ng-container matColumnDef="weight">
                         <th mat-header-cell *matHeaderCellDef> 
@@ -112,26 +135,33 @@
                         </td>
                     </ng-container>
 
-
-
-
                     <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
                     <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
                 </table>
             </div>
 
-            <div *ngIf="!isLoading && !error && elements.length === 0" class="no-data">
+            <div *ngIf="!isLoading() && !error() && !hasElements()" class="no-data">
                 <mat-icon>info</mat-icon>
-                <p>No data to display</p>
+                <p>No elements available</p>
+                <button mat-raised-button color="primary" (click)="loadElements()">
+                    <mat-icon>refresh</mat-icon>
+                    Load Elements
+                </button>
             </div>
 
-            <div *ngIf="!isLoading && !error && elements.length > 0 && filteredElements.length === 0" class="no-results">
+            <div *ngIf="!isLoading() && !error() && hasElements() && !hasSearchResults()" class="no-results">
                 <mat-icon>search_off</mat-icon>
-                <p>No elements found for "{{ searchControl.value }}"</p>
-                <button mat-raised-button color="primary" (click)="clearSearch()">
-                    <mat-icon>clear</mat-icon>
-                    Clear Search
-                </button>
+                <p>No elements found for "<strong>{{ searchTerm() }}</strong>"</p>
+                <div class="no-results-actions">
+                    <button mat-raised-button color="primary" (click)="clearSearch()">
+                        <mat-icon>clear</mat-icon>
+                        Clear Search
+                    </button>
+                    <button mat-stroked-button (click)="resetTable()">
+                        <mat-icon>refresh</mat-icon>
+                        Reset View
+                    </button>
+                </div>
             </div>
         </mat-card-content>
     </mat-card>
