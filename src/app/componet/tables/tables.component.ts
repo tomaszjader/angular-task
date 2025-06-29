@@ -1,16 +1,30 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { Subject, takeUntil } from 'rxjs';
 import { PeriodicElement } from '../../models/periodic-element.model';
 import { PeriodicElementsService } from '../../services/periodic-elements.service';
+import { MatTableModule } from '@angular/material/table';
+import { MatCardModule } from '@angular/material/card';
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatChipsModule } from '@angular/material/chips';
 
 @Component({
   selector: 'app-tables',
   standalone: true,
-  imports: [],
+  imports: [CommonModule,
+    MatTableModule,
+    MatCardModule,
+    MatButtonModule,
+    MatIconModule,
+    MatProgressSpinnerModule,
+    MatChipsModule],
   templateUrl: './tables.component.html',
   styleUrl: './tables.component.scss'
 })
 export class TablesComponent {
+  displayedColumns: string[] = ['position', 'name', 'symbol', 'weight'];
   elements: PeriodicElement[] = [];
   isLoading = false;
   error: string | null = null;

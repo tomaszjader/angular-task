@@ -1,0 +1,53 @@
+.periodic-table-container {
+  padding: 20px;
+}
+
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 40px;
+  gap: 16px;
+}
+
+.error-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 40px;
+  gap: 16px;
+  text-align: center;
+}
+
+.error-message {
+  color: #f44336;
+  margin: 0;
+}
+
+.table-container {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.no-data {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 40px;
+  gap: 16px;
+  text-align: center;
+  color: #757575;
+}
+
+mat-table {
+  width: 100%;
+}
+
+mat-chip-set {
+  display: flex;
+  justify-content: center;
+}
+
+mat-chip {
+  font-weight: bold;
+}
