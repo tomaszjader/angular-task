@@ -1,59 +1,39 @@
-# AngularTask
+# Zadanie rekrutacyjne — Tabela pierwiastków
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 19.2.5.
+## Opis projektu
 
-## Development server
+Stwórz prostą aplikację wyświetlającą tabelę pierwiastków chemicznych z kolumnami:
 
-To start a local development server, run:
+- Number (pozycja)
+- Name (nazwa)
+- Weight (masa)
+- Symbol (symbol)
 
-```bash
-ng serve
-```
+## Wymagania funkcjonalne
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+1. **Pobieranie danych:**  
+   Dane do tabeli powinny być zasymulowane i załadowane automatycznie przy starcie aplikacji (np. za pomocą opóźnienia imitującego zapytanie do API).
 
-## Code scaffolding
+2. **Edycja rekordu:**  
+   Umożliw edycję dowolnej wartości w wybranym wierszu tabeli poprzez popup z inputem.  
+   Po zatwierdzeniu zmiany, tabela powinna się natychmiast zaktualizować.
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+3. **Filtrowanie:**  
+   Dodaj jedno pole tekstowe, które pozwala filtrować wiersze tabeli na podstawie wpisanej frazy.  
+   Filtrowanie powinno działać na wszystkich kolumnach jednocześnie i uruchamiać się 2 sekundy po ostatnim wpisaniu znaku (debounce).
 
-```bash
-ng generate component component-name
-```
+## Dane początkowe
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
-
-```bash
-ng generate --help
-```
-
-## Building
-
-To build the project run:
-
-```bash
-ng build
-```
-
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
-
-## Running unit tests
-
-To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
-
-```bash
-ng test
-```
-
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
-
-```bash
-ng e2e
-```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+```typescript
+const ELEMENT_DATA: PeriodicElement[] = [
+  {position: 1, name: 'Hydrogen', weight: 1.0079, symbol: 'H'},
+  {position: 2, name: 'Helium', weight: 4.0026, symbol: 'He'},
+  {position: 3, name: 'Lithium', weight: 6.941, symbol: 'Li'},
+  {position: 4, name: 'Beryllium', weight: 9.0122, symbol: 'Be'},
+  {position: 5, name: 'Boron', weight: 10.811, symbol: 'B'},
+  {position: 6, name: 'Carbon', weight: 12.0107, symbol: 'C'},
+  {position: 7, name: 'Nitrogen', weight: 14.0067, symbol: 'N'},
+  {position: 8, name: 'Oxygen', weight: 15.9994, symbol: 'O'},
+  {position: 9, name: 'Fluorine', weight: 18.9984, symbol: 'F'},
+  {position: 10, name: 'Neon', weight: 20.1797, symbol: 'Ne'},
+];
