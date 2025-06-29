@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { PeriodicElement } from '../models/periodic-element.model';
 import {PERIODIC_ELEMENTS} from "../data/periodic-elements.data";
+import { Observable, of, delay } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -8,8 +9,10 @@ import {PERIODIC_ELEMENTS} from "../data/periodic-elements.data";
 export class PeriodicElementsService {
   private readonly elements: PeriodicElement[] = PERIODIC_ELEMENTS;
 
-  getElements(): PeriodicElement[] {
-    return this.elements;
+   getElements(): Observable<PeriodicElement[]> {
+    return of(this.elements).pipe(
+      delay(300)
+    );
   }
 
   getElementById(id: number): PeriodicElement | undefined {
