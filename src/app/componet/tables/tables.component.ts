@@ -14,12 +14,18 @@ import { MatChipsModule } from '@angular/material/chips';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { DialogData } from '../../models/dialog-data.model';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { FormControl, ReactiveFormsModule } from '@angular/forms';
+import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
+
 
 @Component({
   selector: 'app-tables',
   standalone: true,
   imports: [
     CommonModule,
+    ReactiveFormsModule,
     MatTableModule,
     MatCardModule,
     MatButtonModule,
@@ -28,6 +34,8 @@ import { DialogData } from '../../models/dialog-data.model';
     MatChipsModule,
     MatDialogModule,
     MatTooltipModule,
+    MatFormFieldModule,
+    MatInputModule,
     EditElementDialogComponent
   ],
   templateUrl: './tables.component.html',
@@ -36,8 +44,11 @@ import { DialogData } from '../../models/dialog-data.model';
 export class TablesComponent implements OnInit, OnDestroy {
   displayedColumns: string[] = ['position', 'name', 'symbol', 'weight'];
   elements: PeriodicElement[] = [];
+  filteredElements: PeriodicElement[] = [];
   isLoading = false;
   error: string | null = null;
+  
+  searchControl = new FormControl('');
   
   private destroy$ = new Subject<void>();
 
@@ -48,6 +59,7 @@ export class TablesComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.loadElements();
+    this.setupSearchFilter();
   }
 
   ngOnDestroy(): void {
@@ -64,6 +76,7 @@ export class TablesComponent implements OnInit, OnDestroy {
       .subscribe({
         next: (data) => {
           this.elements = data;
+          this.filteredElements = [...data];
           this.isLoading = false;
         },
         error: (error) => {
@@ -76,6 +89,41 @@ export class TablesComponent implements OnInit, OnDestroy {
 
   retry(): void {
     this.loadElements();
+  }
+
+  setupSearchFilter(): void {
+    this.searchControl.valueChanges
+      .pipe(
+        debounceTime(2000), 
+        distinctUntilChanged(),
+        takeUntil(this.destroy$)
+      )
+      .subscribe(searchTerm => {
+        this.filterElements(searchTerm || '');
+      });
+  }
+
+  filterElements(searchTerm: string): void {
+    if (!searchTerm.trim()) {
+      this.filteredElements = [...this.elements];
+      return;
+    }
+
+    const lowerSearchTerm = searchTerm.toLowerCase().trim();
+    
+    this.filteredElements = this.elements.filter(element => {
+      return (
+        element.name.toLowerCase().includes(lowerSearchTerm) ||
+        element.symbol.toLowerCase().includes(lowerSearchTerm) ||
+        element.position.toString().includes(lowerSearchTerm) ||
+        element.weight.toString().includes(lowerSearchTerm)
+      );
+    });
+  }
+
+  clearSearch(): void {
+    this.searchControl.setValue('');
+    this.filteredElements = [...this.elements];
   }
 
   editElement(element: PeriodicElement, field: keyof PeriodicElement): void {
@@ -113,6 +161,7 @@ export class TablesComponent implements OnInit, OnDestroy {
     if (index !== -1) {
       this.elements[index] = updatedElement;
       this.elements = [...this.elements];
+      this.filterElements(this.searchControl.value || '');
     }
   }
 

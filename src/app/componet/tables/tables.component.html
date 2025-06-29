@@ -6,6 +6,31 @@
         </mat-card-header>
 
         <mat-card-content>
+            <div class="search-container" *ngIf="!isLoading && !error">
+                <mat-form-field appearance="outline" class="search-field">
+                    <mat-label>Search elements...</mat-label>
+                    <input 
+                        matInput 
+                        [formControl]="searchControl"
+                        placeholder="Type to search by name, symbol, number, or weight"
+                        autocomplete="off">
+                    <mat-icon matSuffix>search</mat-icon>
+                    <button 
+                        *ngIf="searchControl.value" 
+                        matSuffix 
+                        mat-icon-button 
+                        aria-label="Clear search"
+                        (click)="clearSearch()"
+                        type="button">
+                        <mat-icon>close</mat-icon>
+                    </button>
+                </mat-form-field>
+                
+                <div class="search-info" *ngIf="searchControl.value">
+                    <mat-icon class="info-icon">info</mat-icon>
+                    <span>Showing {{ filteredElements.length }} of {{ elements.length }} elements</span>
+                </div>
+            </div>
 
             <div *ngIf="isLoading" class="loading-container">
                 <mat-spinner diameter="50"></mat-spinner>
@@ -24,7 +49,7 @@
 
 
             <div *ngIf="!isLoading && !error && elements.length > 0" class="table-container">
-                <table mat-table [dataSource]="elements" class="mat-elevation-8 editable-table">
+                <table mat-table [dataSource]="filteredElements" class="mat-elevation-8 editable-table">
 
 
                     <ng-container matColumnDef="position">
@@ -98,6 +123,15 @@
             <div *ngIf="!isLoading && !error && elements.length === 0" class="no-data">
                 <mat-icon>info</mat-icon>
                 <p>No data to display</p>
+            </div>
+
+            <div *ngIf="!isLoading && !error && elements.length > 0 && filteredElements.length === 0" class="no-results">
+                <mat-icon>search_off</mat-icon>
+                <p>No elements found for "{{ searchControl.value }}"</p>
+                <button mat-raised-button color="primary" (click)="clearSearch()">
+                    <mat-icon>clear</mat-icon>
+                    Clear Search
+                </button>
             </div>
         </mat-card-content>
     </mat-card>
