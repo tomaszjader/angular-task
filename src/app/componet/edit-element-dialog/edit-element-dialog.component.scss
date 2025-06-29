@@ -1,0 +1,32 @@
+.dialog-container {
+    min-width: 400px;
+}
+
+.full-width {
+    width: 100%;
+}
+
+.element-info {
+    background-color: #f5f5f5;
+    padding: 12px;
+    border-radius: 4px;
+    margin-bottom: 16px;
+}
+
+h2 {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0 0 16px 0;
+}
+
+mat-dialog-actions {
+    gap: 8px;
+    padding-top: 16px;
+}
+
+button {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}

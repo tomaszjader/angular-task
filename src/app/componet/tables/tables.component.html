@@ -2,6 +2,7 @@
     <mat-card>
         <mat-card-header>
             <mat-card-title>Table of Elements</mat-card-title>
+            <mat-card-subtitle>Click any cell to edit its value</mat-card-subtitle>
         </mat-card-header>
 
         <mat-card-content>
@@ -23,32 +24,66 @@
 
 
             <div *ngIf="!isLoading && !error && elements.length > 0" class="table-container">
-                <table mat-table [dataSource]="elements" class="mat-elevation-8">
+                <table mat-table [dataSource]="elements" class="mat-elevation-8 editable-table">
 
 
                     <ng-container matColumnDef="position">
-                        <th mat-header-cell *matHeaderCellDef> Number </th>
-                        <td mat-cell *matCellDef="let element"> {{element.position}} </td>
+                        <th mat-header-cell *matHeaderCellDef> 
+                            Number 
+                            <mat-icon class="info-icon" matTooltip="Click to edit">info</mat-icon>
+                        </th>
+                        <td mat-cell *matCellDef="let element" 
+                            class="editable-cell" 
+                            (click)="editElement(element, 'position')"
+                            [matTooltip]="'Click to edit ' + getFieldDisplayName('position')">
+                            {{element.position}}
+                            <mat-icon class="edit-icon">edit</mat-icon>
+                        </td>
                     </ng-container>
 
 
                     <ng-container matColumnDef="name">
-                        <th mat-header-cell *matHeaderCellDef> Name </th>
-                        <td mat-cell *matCellDef="let element"> {{element.name}} </td>
+                        <th mat-header-cell *matHeaderCellDef> 
+                            Name 
+                            <mat-icon class="info-icon" matTooltip="Click to edit">info</mat-icon>
+                        </th>
+                        <td mat-cell *matCellDef="let element" 
+                            class="editable-cell" 
+                            (click)="editElement(element, 'name')"
+                            [matTooltip]="'Click to edit ' + getFieldDisplayName('name')">
+                            {{element.name}}
+                            <mat-icon class="edit-icon">edit</mat-icon>
+                        </td>
                     </ng-container>
 
 
                     <ng-container matColumnDef="weight">
-                        <th mat-header-cell *matHeaderCellDef> Weight </th>
-                        <td mat-cell *matCellDef="let element"> {{element.weight}} </td>
+                        <th mat-header-cell *matHeaderCellDef> 
+                            Weight 
+                            <mat-icon class="info-icon" matTooltip="Click to edit">info</mat-icon>
+                        </th>
+                        <td mat-cell *matCellDef="let element" 
+                            class="editable-cell" 
+                            (click)="editElement(element, 'weight')"
+                            [matTooltip]="'Click to edit ' + getFieldDisplayName('weight')">
+                            {{element.weight}}
+                            <mat-icon class="edit-icon">edit</mat-icon>
+                        </td>
                     </ng-container>
 
                     <ng-container matColumnDef="symbol">
-                        <th mat-header-cell *matHeaderCellDef> Symbol </th>
-                        <td mat-cell *matCellDef="let element">
+                        <th mat-header-cell *matHeaderCellDef> 
+                            Symbol 
+                            <mat-icon class="info-icon" matTooltip="Click to edit">info</mat-icon>
+                        </th>
+                        <td mat-cell *matCellDef="let element" 
+                            class="editable-cell" 
+                            (click)="editElement(element, 'symbol')"
+                            [matTooltip]="'Click to edit ' + getFieldDisplayName('symbol')">
                             <mat-chip-set>
                                 <mat-chip>{{element.symbol}}</mat-chip>
                             </mat-chip-set>
+                            <mat-icon class="edit-icon">edit</mat-icon>
                         </td>
                     </ng-container>
 
